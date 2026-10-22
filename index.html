@@ -129,6 +129,23 @@ h2{font-family:var(--display);font-weight:400;letter-spacing:1px;font-size:22px;
 .opt{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
 textarea{width:100%;min-height:90px;background:#0b0f2a;color:#fff;border:2px solid #000;border-radius:10px;padding:8px;font-family:monospace;font-size:12px}
 .muted{color:var(--muted)}
+.btn:disabled{opacity:.45;cursor:default;transform:none}
+#btnRebirth{background:#5a2a78}
+#btnRebirth.ready{background:#8a3fb0;animation:pulse 1s ease-in-out infinite}
+#soulBadge{font-style:normal;color:var(--gold);margin-left:4px}
+#soulBadge:empty{display:none}
+.btn.rb{background:#8a3fb0;font-size:17px;padding:9px 18px}
+.perks{display:grid;gap:6px}
+.perk{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.3);border:2px solid #000;border-radius:10px;padding:6px 8px}
+.perk .pi{font-size:26px;width:34px;text-align:center;flex:none}
+.perk .pt{flex:1;font-size:13px;color:var(--muted)}
+.perk .pt b{color:#fff}
+.perk .pt .pn{display:block;font-size:15px}
+.perk.got{border-color:var(--gold)}
+.perk .btn{flex:none;min-width:74px}
+.adm label{display:block;font-weight:900;color:var(--gold);margin-top:8px}
+.adm .opt{margin:4px 0}
+.adm input,.adm select,#adPw{background:#0b0f2a;color:#fff;border:2px solid #000;border-radius:8px;padding:6px 8px;font:inherit;font-weight:700;min-width:0}
 code{background:#0b0f2a;padding:1px 5px;border-radius:5px}
 
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -148,6 +165,15 @@ code{background:#0b0f2a;padding:1px 5px;border-radius:5px}
   .logo{font-size:21px}
   .btn{padding:5px 8px;font-size:14px}
   .hbtns{gap:5px}
+  .btn{white-space:nowrap}
+  #btnRebirth{position:relative}
+  #btnRebirth .lbl{display:none}
+  #soulBadge{position:absolute;top:-7px;right:-8px;background:#000;border-radius:8px;padding:0 4px;font-size:11px;margin:0;line-height:16px}
+}
+@media (max-width:420px){
+  .logo{font-size:17px}
+  .logo span{margin-left:4px}
+  .btn{padding:5px 7px}
   main{display:flex;flex-direction:column;height:auto}
   #left{min-height:600px;border-right:0;border-bottom:4px solid #000}
   #right{order:2;border-bottom:4px solid #000}
@@ -166,8 +192,9 @@ body.setup{overflow:auto;height:auto}
 </head>
 <body>
 <header>
-  <div class="logo">DAMIAN<span>CLICKER</span></div>
+  <div class="logo" id="logo">DAMIAN<span>CLICKER</span></div>
   <div class="hbtns">
+    <button class="btn" id="btnRebirth" title="Rebirth">👼<span class="lbl"> Rebirth</span><i id="soulBadge"></i></button>
     <button class="btn" id="btnStats">Stats</button>
     <button class="btn" id="btnOptions">Options</button>
     <button class="btn" id="btnMute" title="Sound">🔊</button>
@@ -631,7 +658,11 @@ const RECIPES = {
   time:    { filter: 'sepia(1) contrast(1.15)', inside: ['ghost'], over: ['clock'], ring: '#e0c68a', bg: '#5d4a30' },
   anti:    { filter: 'invert(1) hue-rotate(180deg) contrast(1.2)', over: ['orbits', 'whiteEyes'], ring: '#7af7ff', bg: '#000' },
   prism:   { inside: ['rainbow'], over: ['rainbowShades', 'sparkles'], ring: '#fff', bg: '#222', anim: 'rainbow' },
-  golden:  { filter: 'sepia(1) saturate(3.5) hue-rotate(-8deg) brightness(1.1)', over: ['sparkles'], ring: '#ffd34d', bg: '#7a5a00' },
+  clone:   { filter: 'hue-rotate(140deg) saturate(1.7) contrast(1.1)', inside: ['sparkleIn'], over: ['goggles', 'whiteEyes'], ring: '#5fffd0', bg: '#0a4a40' },
+  galaxy:  { filter: 'hue-rotate(200deg) saturate(1.5) contrast(1.15)', inside: ['starsIn', 'swirl'], over: ['orbits', 'sparkles'], ring: '#a0b4ff', bg: '#0a0a40' },
+  multi:   { filter: 'hue-rotate(300deg) saturate(2.2) contrast(1.2)', inside: ['swirl', 'ghost'], over: ['halo', 'thirdEye', 'whiteEyes'], ring: '#ff9df5', bg: '#300040' },
+  sing:    { filter: 'contrast(1.4) saturate(1.8)', inside: ['rainbow', 'rays'], over: ['fire', 'horns', 'crown', 'rainbowShades', 'laser', 'sparkles'], ring: '#fff', bg: '#000', anim: 'rainbow' },
+  golden: { filter: 'sepia(1) saturate(3.5) hue-rotate(-8deg) brightness(1.1)', over: ['sparkles'], ring: '#ffd34d', bg: '#7a5a00' },
 };
 
 // The big Damian evolves as you collect more.
@@ -643,6 +674,10 @@ const STAGES = [
   { at: 5e7,  name: 'King Damian',     r: { filter: 'saturate(1.6) contrast(1.2) sepia(.2)', over: ['fire', 'chain', 'crown', 'laser'], ring: '#ffcc33' } },
   { at: 5e9,  name: 'Demon God Damian', r: { filter: 'hue-rotate(-25deg) saturate(2) contrast(1.3)', inside: ['swirl'], over: ['fire', 'horns', 'halo', 'thirdEye', 'laser'], ring: '#ff2a6d' } },
   { at: 5e11, name: 'OMEGA DAMIAN',    r: { inside: ['rainbow'], over: ['fire', 'orbits', 'horns', 'crown', 'chain', 'rainbowShades', 'laser', 'sparkles'], ring: '#fff', anim: 'rainbow' } },
+  { at: 5e13, name: 'Cosmic Damian',   r: { filter: 'hue-rotate(190deg) saturate(1.6) contrast(1.15)', inside: ['starsIn'], over: ['orbits', 'halo', 'shades', 'sparkles'], ring: '#7af7ff' } },
+  { at: 5e15, name: 'Galaxy Brain Damian', r: { filter: 'hue-rotate(260deg) saturate(2) contrast(1.25)', inside: ['swirl', 'starsIn'], over: ['thirdEye', 'orbits', 'crown', 'laser'], ring: '#b48cff' } },
+  { at: 5e17, name: 'Damian Prime',    r: { filter: 'sepia(.8) saturate(3) brightness(1.1)', inside: ['rays'], over: ['fire', 'halo', 'horns', 'chain', 'crown', 'rainbowShades', 'laser', 'sparkles'], ring: '#ffd34d' } },
+  { at: 1e20, name: 'THE ONE TRUE DAMIAN', r: { filter: 'contrast(1.3) saturate(1.6)', inside: ['rainbow', 'rays', 'starsIn'], over: ['fire', 'orbits', 'halo', 'horns', 'crown', 'chain', 'rainbowShades', 'laser', 'sparkles'], ring: '#fff', anim: 'rainbow' } },
 ];
 
 /* =====================================================================
@@ -663,6 +698,10 @@ const BUILDINGS = [
   { id: 'time',    name: 'Damian Time Machine',  plural: 'Damian Time Machines',  base: 1.4e13, dps: 6.5e7, desc: 'Brings in Damians from the past, before he was even born.' },
   { id: 'anti',    name: 'Antimatter Damian Condenser', plural: 'Antimatter Damian Condensers', base: 1.7e14, dps: 4.3e8, desc: 'Condenses the antimatter of the universe into Damian.' },
   { id: 'prism',   name: 'Damian Prism',         plural: 'Damian Prisms',         base: 2.1e15, dps: 2.9e9, desc: 'Converts light itself into Damian. The sun has filed a complaint.' },
+  { id: 'clone',   name: 'Damian Cloning Vat',   plural: 'Damian Cloning Vats',   base: 2.6e16, dps: 2.1e10, desc: 'Grows Damians in green goo. They all come out saying "Damian".' },
+  { id: 'galaxy',  name: 'Damian Galaxy',        plural: 'Damian Galaxies',       base: 3.1e17, dps: 1.5e11, desc: 'A whole galaxy where every star is just Damian.' },
+  { id: 'multi',   name: 'Damian Multiverse',    plural: 'Damian Multiverses',    base: 4e18,   dps: 1.1e12, desc: 'Steals Damians from every other universe. They want them back.' },
+  { id: 'sing',    name: 'THE DAMIAN SINGULARITY', plural: 'DAMIAN SINGULARITIES', base: 5.5e19, dps: 8e12, desc: 'All of reality collapses into one infinitely dense Damian.' },
 ];
 const BY_ID = Object.fromEntries(BUILDINGS.map(b => [b.id, b]));
 
@@ -678,13 +717,15 @@ const TIERS = [
 const CLICKUPS = [
   ['Plastic Damian Mouse', 1e3, 5e4], ['Iron Damian Mouse', 1e5, 5e6], ['Titanium Damian Mouse', 1e7, 5e8],
   ['Adamantium Damian Mouse', 1e9, 5e10], ['Unobtainium Damian Mouse', 1e11, 5e12], ['Damian-Infused Mouse', 1e13, 5e14],
+  ['Cosmic Damian Mouse', 1e15, 5e16], ['Singularity Damian Mouse', 1e17, 5e18],
 ];
 const FLAVORS = [
   ['Extra Crispy Damian', 1e6, .05], ['Damian With Sauce', 5e6, .05], ['Spicy Damian', 2e7, .1], ['Deep Fried Damian', 1e8, .1],
   ['Damian Deluxe', 1e9, .15], ['Gourmet Damian', 1e10, .15], ['Damian Supreme', 1e11, .2], ['Diamond-Encrusted Damian', 1e12, .2],
-  ['Cosmic Damian Dust', 1e13, .25], ['Damian Essence', 1e14, .25], ['Pure Concentrated Damian', 1e15, .3], ['The Final Damian Flavor', 1e16, .5],
+  ['Cosmic Damian Dust', 1e13, .25], ['Damian Essence', 1e14, .25], ['Pure Concentrated Damian', 1e15, .3], ['The Final Damian Flavor (not really)', 1e16, .5],
+  ['Galactic Damian Glaze', 1e17, .3], ['Multiversal Damian Sauce', 1e18, .4], ['Singularity Seasoning', 1e19, .5], ['Infinite Damian Flavor', 1e20, .75],
 ];
-const GOLDUPS = [['Lucky Damian', 777777], ['Fortunate Damian', 77777777], ['Serendipitous Damian', 7.7e9]];
+const GOLDUPS = [['Lucky Damian', 777777], ['Fortunate Damian', 77777777], ['Serendipitous Damian', 7.7e9], ['Blessed Damian', 7.7e12]];
 
 const UPGRADES = [];
 BUILDINGS.forEach(b => TIERS.forEach((t, ti) => UPGRADES.push({
@@ -693,7 +734,7 @@ BUILDINGS.forEach(b => TIERS.forEach((t, ti) => UPGRADES.push({
   flavor: `Requires ${t.req} ${t.req === 1 ? b.name : b.plural}.`, unlock: () => own(b.id) >= t.req,
 })));
 CLICKUPS.forEach(([name, need, cost], i) => UPGRADES.push({
-  id: `click_${i}`, name, cost, color: TIERS[i].color, icon: () => ICONS.cursor,
+  id: `click_${i}`, name, cost, color: TIERS[i % TIERS.length].color, icon: () => ICONS.cursor,
   desc: 'Clicking Damian gains <b>+1%</b> of your Damians per second.', flavor: 'Built for serious Damian clicking.', unlock: () => state.handMade >= need,
 }));
 FLAVORS.forEach(([name, cost, pct], i) => UPGRADES.push({
@@ -728,6 +769,19 @@ const ACH = [
   ['cool', 'Too Cool', 'Unlock Cool Damian.', s => s.stage >= 1],
   ['king', 'All Hail', 'Unlock King Damian.', s => s.stage >= 4],
   ['omega', 'Ascended', 'Unlock OMEGA DAMIAN.', s => s.stage >= 6],
+  ['click25k', 'Carpal Tunnel', 'Click Damian 25,000 times.', s => s.clicks >= 25000],
+  ['dps1t', 'Damian Big Bang', 'Make 1 trillion Damians per second.', () => dps() >= 1e12],
+  ['all1qi', 'Damian Quintillionaire', 'Make 1 quintillion Damians across all your lives.', () => allTime() >= 1e18],
+  ['gold77', 'Golden Addiction', 'Click 77 Golden Damians.', s => s.goldenClicks >= 77],
+  ['own500', 'Damian Landlord', 'Own 500 buildings at once.', () => BUILDINGS.reduce((n, b) => n + own(b.id), 0) >= 500],
+  ['sing1', 'Event Horizon', 'Own THE DAMIAN SINGULARITY.', () => own('sing') >= 1],
+  ['cosmic', 'Beyond Omega', 'Unlock Cosmic Damian.', s => s.stage >= 7],
+  ['onetrue', 'There Can Be Only One', 'Unlock THE ONE TRUE DAMIAN.', s => s.stage >= STAGES.length - 1],
+  ['reb1', 'Born Again', 'Rebirth once.', s => s.rebirths >= 1],
+  ['reb5', 'Reincarnation Expert', 'Rebirth 5 times.', s => s.rebirths >= 5],
+  ['reb25', 'Damian Samsara', 'Rebirth 25 times.', s => s.rebirths >= 25],
+  ['soul100', 'Soul Collector', 'Have 100 Damian Souls.', s => s.souls >= 100],
+  ['perkAll', 'Fully Blessed', 'Buy every perk in the Soul Shop.', () => PERKS.every(p => hasPerk(p.id))],
 ];
 
 const NEWS = [
@@ -757,13 +811,53 @@ const NEWS = [
   [s => s.stage >= 5, 'Damian has grown horns. Damian\'s mom says "he was always like this".'],
   [s => s.total > 1e9, 'Global Damian population now exceeds the human population. "It is fine," says Damian.'],
   [s => s.total > 1e12, 'Astronomers discover a galaxy shaped like Damian. It is made of Damian.'],
+  [() => own('clone') > 0, 'Cloning lab reports 4,000 new Damians. All of them want snacks.'],
+  [() => own('galaxy') > 0, 'NASA renames the Milky Way to the Damian Way. Nobody objects.'],
+  [() => own('multi') > 0, 'Damian from another universe visits. He is also named Damian.'],
+  [() => own('sing') > 0, 'Physicists confirm the universe is now 100% Damian. "We had a good run," they say.'],
+  [s => s.rebirths > 0, 'Damian reborn again. Claims to remember all his past lives, all of which were Damian.'],
+  [s => s.rebirths > 0, 'Soul Shop reports record sales. Souls are, of course, Damian souls.'],
+  [s => s.rebirths >= 5, 'Scientists baffled as Damian keeps dying and coming back stronger. "Just like a video game," says Damian.'],
+  [s => s.stage >= 7, 'Damian spotted floating in space. Witnesses say he was "just vibing".'],
 ];
+
+// Soul Shop perks. Bought with Damian Souls and kept forever, through every rebirth.
+const PERKS = [
+  { id: 'fingers',   name: 'Strong Fingers',    cost: 1,   icon: '💪', desc: 'Clicking Damian is <b>3x</b> as strong.' },
+  { id: 'cheap',     name: 'Cheap Labor',       cost: 3,   icon: '🏷️', desc: 'All buildings are <b>10%</b> cheaper.' },
+  { id: 'head',      name: 'Head Start',        cost: 5,   icon: '🚀', desc: 'Every rebirth starts with <b>10 Cursors, 5 Grandmas and 2 Farms</b>.' },
+  { id: 'goldTouch', name: 'Golden Touch',      cost: 10,  icon: '✨', desc: 'Golden Damians show up <b>50%</b> more often.' },
+  { id: 'night',     name: 'Night Shift',       cost: 15,  icon: '🌙', desc: 'While you are away, Damians keep coming for up to <b>3 days</b> instead of 1.' },
+  { id: 'lucky',     name: 'Lucky Charm',       cost: 20,  icon: '🍀', desc: 'Golden Damian buffs last <b>50%</b> longer.' },
+  { id: 'twin',      name: 'Twin Damians',      cost: 30,  icon: '👯', desc: 'Every click has a <b>10%</b> chance to be a <b>x10</b> critical click.' },
+  { id: 'bigStart',  name: 'Trust Fund',        cost: 40,  icon: '💰', desc: 'Every rebirth starts with <b>1 million</b> Damians in the bank.' },
+  { id: 'overdrive', name: 'Overdrive',         cost: 50,  icon: '⚡', desc: 'All Damian production <b>x2</b>.' },
+  { id: 'auto',      name: 'Ghost Clicker',     cost: 75,  icon: '👻', desc: 'A ghost of Damian clicks him for you <b>5 times a second</b>.' },
+  { id: 'soulPower', name: 'Soul Fusion',       cost: 100, icon: '🔥', desc: 'Each soul gives <b>+3%</b> production instead of +2%.' },
+  { id: 'cheap2',    name: 'Damian Union Deal', cost: 150, icon: '🤝', desc: 'All buildings are another <b>15%</b> cheaper.' },
+  { id: 'hyper',     name: 'Hyperdrive',        cost: 250, icon: '🌌', desc: 'All Damian production <b>x3</b>.' },
+];
+const SOUL_DIVISOR = 1e9;   // souls earned = cube root of (all-time Damians / this)
 
 /* =====================================================================
    STATE
    ===================================================================== */
-const state = { damians: 0, total: 0, handMade: 0, clicks: 0, goldenClicks: 0, owned: {}, upgrades: {}, ach: {}, buffs: [], stage: 0, mute: false, started: Date.now(), lastSave: Date.now() };
+// total = made this life; prevTotal = made in all earlier lives (before rebirths).
+// souls = all souls ever earned (each one boosts production); soulsSpent = how many went to perks.
+const DEFAULT_STATE = () => ({ damians: 0, total: 0, handMade: 0, clicks: 0, goldenClicks: 0, owned: {}, upgrades: {}, ach: {}, buffs: [], stage: 0, mute: false, started: Date.now(), lastSave: Date.now(),
+  prevTotal: 0, rebirths: 0, souls: 0, soulsSpent: 0, perks: {} });
+const state = DEFAULT_STATE();
 const own = id => state.owned[id] || 0;
+const hasPerk = id => !!state.perks[id];
+const allTime = () => state.prevTotal + state.total;
+const soulsFor = n => Math.floor(Math.cbrt(n / SOUL_DIVISOR));
+const pendingSouls = () => Math.max(0, soulsFor(allTime()) - state.souls);
+const soulsFree = () => state.souls - state.soulsSpent;
+function soulMult() { return 1 + state.souls * (hasPerk('soulPower') ? .03 : .02); }
+function prodMult() { return flavMult() * soulMult() * (hasPerk('overdrive') ? 2 : 1) * (hasPerk('hyper') ? 3 : 1) * adminSpeed; }
+function costMult() { return (hasPerk('cheap') ? .9 : 1) * (hasPerk('cheap2') ? .85 : 1); }
+function buffLen() { return hasPerk('lucky') ? 1.5 : 1; }
+let adminSpeed = 1;   // admin menu production booster, never saved
 let BASES = [], ICONS = {}, FLAV_ICONS = {}, STAGE_BIG = null, STAGE_SMALL = null, shownStage = -1, bulk = 1, usingPlaceholder = false;
 
 function bMult(b) { let m = 1; for (let t = 0; t < TIERS.length; t++) if (state.upgrades[`b_${b.id}_${t}`]) m *= 2; return m; }
@@ -771,24 +865,39 @@ function flavMult() { let m = 1; FLAVORS.forEach((f, i) => { if (state.upgrades[
 function buffMult(type) { let m = 1; const now = Date.now(); state.buffs.forEach(b => { if (b.type === type && b.end > now) m *= b.mult; }); return m; }
 function goldCount() { return GOLDUPS.reduce((n, g, i) => n + (state.upgrades['gold_' + i] ? 1 : 0), 0); }
 const SPEED = CONFIG.speed, GROW = SPEED.costGrowth;
-function perBuilding(b) { return b.dps * SPEED.production * bMult(b) * flavMult() * buffMult('frenzy'); }
-function baseDps() { let s = 0; BUILDINGS.forEach(b => s += own(b.id) * b.dps * bMult(b)); return s * SPEED.production * flavMult(); }
+function perBuilding(b) { return b.dps * SPEED.production * bMult(b) * prodMult() * buffMult('frenzy'); }
+function baseDps() { let s = 0; BUILDINGS.forEach(b => s += own(b.id) * b.dps * bMult(b)); return s * SPEED.production * prodMult(); }
 function dps() { return baseDps() * buffMult('frenzy'); }
 function clickPower() {
   let pct = 0; CLICKUPS.forEach((c, i) => { if (state.upgrades['click_' + i]) pct += .01; });
-  return (SPEED.click * bMult(BUILDINGS[0]) * flavMult() * buffMult('frenzy') + pct * dps()) * buffMult('click');
+  return (SPEED.click * bMult(BUILDINGS[0]) * prodMult() * buffMult('frenzy') + pct * dps()) * buffMult('click') * (hasPerk('fingers') ? 3 : 1);
 }
-function price(b) { return Math.ceil(b.base * Math.pow(GROW, own(b.id))); }
-function bulkCost(b, n) { return Math.ceil(b.base * Math.pow(GROW, own(b.id)) * (Math.pow(GROW, n) - 1) / (GROW - 1)); }
+function price(b) { return Math.ceil(b.base * Math.pow(GROW, own(b.id)) * costMult()); }
+function bulkCost(b, n) { return Math.ceil(b.base * Math.pow(GROW, own(b.id)) * (Math.pow(GROW, n) - 1) / (GROW - 1) * costMult()); }
 function stageFor(total) { let s = 0; STAGES.forEach((st, i) => { if (total >= st.at) s = i; }); return s; }
 
 function save() { if (resetting) return; state.lastSave = Date.now(); try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (e) { } }
+// Copy a saved game over the defaults. Anything missing or broken (older saves, hand-edited codes)
+// keeps its default, so saves from every older version of the game still load.
+function applySave(s) {
+  if (!s || typeof s !== 'object') return;
+  const def = DEFAULT_STATE();
+  for (const k in def) {
+    const v = s[k], d = def[k];
+    if (typeof d === 'number') { if (typeof v === 'number' && isFinite(v) && v >= 0) state[k] = v; }
+    else if (typeof d === 'boolean') { if (typeof v === 'boolean') state[k] = v; }
+    else if (Array.isArray(d)) { if (Array.isArray(v)) state[k] = v.filter(b => b && typeof b.end === 'number' && typeof b.mult === 'number'); }
+    else if (v && typeof v === 'object' && !Array.isArray(v)) {
+      const o = {}; for (const id in v) if (typeof v[id] === 'number' && isFinite(v[id]) && v[id] >= 0) o[id] = v[id];
+      state[k] = o;
+    }
+  }
+  state.stage = Math.min(Math.floor(state.stage), STAGES.length - 1);
+  state.soulsSpent = Math.min(state.soulsSpent, state.souls);
+}
 function load() {
-  try {
-    const s = migrateSave(JSON.parse(localStorage.getItem(SAVE_KEY) || localStorage.getItem(OLD_SAVE_KEY)));
-    if (s && typeof s === 'object') Object.assign(state, s);
-  } catch (e) { }
-  state.buffs = (state.buffs || []).filter(b => b.end > Date.now());
+  try { applySave(migrateSave(JSON.parse(localStorage.getItem(SAVE_KEY) || localStorage.getItem(OLD_SAVE_KEY)))); } catch (e) { }
+  state.buffs = state.buffs.filter(b => b.end > Date.now());
 }
 
 /* =====================================================================
@@ -813,19 +922,35 @@ function sfx(kind) {
 }
 // Damian's voice clips. Only one plays at a time; the big Damian shakes while he talks.
 const VOICES = (CONFIG.sounds || []).map(src => { const a = new Audio(src); a.preload = 'auto'; return a; });
-let lastVoice = -1;
+// Backup copies of the clips for Web Audio, for sites that block <audio> from playing them (e.g. Neocities).
+const VOICE_DATA = [], VOICE_BUFS = [];
+(CONFIG.sounds || []).forEach((src, i) => { fetch(src).then(r => r.arrayBuffer()).then(b => { VOICE_DATA[i] = b; }).catch(() => { }); });
+let lastVoice = -1, voiceBusyUntil = 0;
 function voice(force) {
-  if (state.mute || !VOICES.length || VOICES.some(a => !a.paused)) return;
+  if (state.mute || !VOICES.length || VOICES.some(a => !a.paused) || performance.now() < voiceBusyUntil) return;
   if (!force && Math.random() >= CONFIG.voiceChance) return;
   let i = Math.floor(Math.random() * VOICES.length);
   if (VOICES.length > 1 && i === lastVoice) i = (i + 1) % VOICES.length;
   lastVoice = i;
   const a = VOICES[i], big = $('dwrap');
+  if (a.error) return voiceViaWebAudio(i, big);
   a.currentTime = 0;
   a.play().then(() => {
     big.classList.add('talking');
     a.onended = a.onpause = () => big.classList.remove('talking');
-  }).catch(() => { });
+  }).catch(() => voiceViaWebAudio(i, big));
+}
+function voiceViaWebAudio(i, big) {
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const play = buf => {
+      const s = AC.createBufferSource(); s.buffer = buf; s.connect(AC.destination); s.start();
+      voiceBusyUntil = performance.now() + buf.duration * 1000;
+      big.classList.add('talking'); s.onended = () => big.classList.remove('talking');
+    };
+    if (VOICE_BUFS[i]) return play(VOICE_BUFS[i]);
+    if (VOICE_DATA[i]) AC.decodeAudioData(VOICE_DATA[i].slice(0)).then(buf => { VOICE_BUFS[i] = buf; play(buf); }).catch(() => { });
+  } catch (e) { }
 }
 
 /* =====================================================================
@@ -962,6 +1087,7 @@ function tick() {
   const now = Date.now(); let dt = (now - lastTick) / 1000; lastTick = now;
   dt = Math.max(0, Math.min(dt, 86400));
   const g = dps() * dt; state.damians += g; state.total += g;
+  if (hasPerk('auto') && dt < 5) { const a = clickPower() * 5 * dt; state.damians += a; state.total += a; }
   state.buffs = state.buffs.filter(b => b.end > now);
   if (!golden && now >= nextGoldenAt) spawnGolden();
   if (golden && now > golden.until) removeGolden();
@@ -972,6 +1098,8 @@ function updateUI() {
   $('count').textContent = countText; $('count').style.fontSize = countText.length > 18 ? '25px' : '';
   $('dps').textContent = 'per second: ' + fmt(dps(), 1);
   document.title = `${fmt(d)}${word} - Damian Clicker`;
+  const pend = pendingSouls();
+  $('soulBadge').textContent = pend >= 1 ? '+' + fmt(pend) : ''; $('btnRebirth').classList.toggle('ready', pend >= 1);
 
   let mysteryShown = false;
   BUILDINGS.forEach(b => {
@@ -1007,8 +1135,9 @@ function checkAch() {
 const parts = [], rain = [];
 function onClick(e) {
   e.preventDefault();
-  const p = clickPower(); state.damians += p; state.total += p; state.handMade += p; state.clicks++;
-  floatText(e.clientX, e.clientY - 10, '+' + fmt(p, 1));
+  const crit = hasPerk('twin') && Math.random() < .1;
+  const p = clickPower() * (crit ? 10 : 1); state.damians += p; state.total += p; state.handMade += p; state.clicks++;
+  floatText(e.clientX, e.clientY - 10, (crit ? 'CRIT! +' : '+') + fmt(p, 1), crit ? '#ff5fa2' : null);
   for (let i = 0; i < 2; i++) parts.push({ x: e.clientX, y: e.clientY, vx: (Math.random() - .5) * 420, vy: -220 - Math.random() * 260, r: Math.random() * 6, vr: (Math.random() - .5) * 10, life: 1, s: 26 + Math.random() * 16, img: STAGE_SMALL });
   sfx('click'); voice(false);
   const big = $('bigDamian'); big.classList.add('pressed'); setTimeout(() => big.classList.remove('pressed'), 70);
@@ -1017,7 +1146,7 @@ function onClick(e) {
 
 /* ---- golden Damian ---- */
 let golden = null, nextGoldenAt = 0;
-function goldFreq() { return Math.pow(1.35, goldCount()); }
+function goldFreq() { return Math.pow(1.35, goldCount()) * (hasPerk('goldTouch') ? 1.5 : 1); }
 function scheduleGolden() { const [lo, hi] = SPEED.goldenEvery; nextGoldenAt = Date.now() + (lo + Math.random() * (hi - lo)) * 1000 / goldFreq(); }
 function spawnGolden() {
   const el = iconEl(ICONS.golden, 200); el.className = 'golden';
@@ -1039,11 +1168,11 @@ function clickGolden(e) {
     toast('Lucky!', `Golden Damian gave you <b style="display:inline;font-family:inherit;color:#fff">${fmt(gain)}</b> Damians!`);
     floatText(e.clientX, e.clientY, '+' + fmt(gain), '#ffd34d');
   } else if (r < .85) {
-    state.buffs.push({ type: 'frenzy', mult: 7, end: now + 77000, name: 'Frenzy' });
-    toast('Frenzy!', 'Damian production x7 for 77 seconds!'); floatText(e.clientX, e.clientY, 'FRENZY!', '#ffd34d');
+    state.buffs.push({ type: 'frenzy', mult: 7, end: now + 77000 * buffLen(), name: 'Frenzy' });
+    toast('Frenzy!', `Damian production x7 for ${Math.round(77 * buffLen())} seconds!`); floatText(e.clientX, e.clientY, 'FRENZY!', '#ffd34d');
   } else {
-    state.buffs.push({ type: 'click', mult: 777, end: now + 13000, name: 'Damian Fury' });
-    toast('Damian Fury!', 'Clicking power x777 for 13 seconds! CLICK CLICK CLICK!'); floatText(e.clientX, e.clientY, 'DAMIAN FURY!', '#ff5fa2');
+    state.buffs.push({ type: 'click', mult: 777, end: now + 13000 * buffLen(), name: 'Damian Fury' });
+    toast('Damian Fury!', `Clicking power x777 for ${Math.round(13 * buffLen())} seconds! CLICK CLICK CLICK!`); floatText(e.clientX, e.clientY, 'DAMIAN FURY!', '#ff5fa2');
   }
   removeGolden(); updateUI();
 }
@@ -1129,7 +1258,8 @@ function showStats() {
   const nB = BUILDINGS.reduce((n, b) => n + own(b.id), 0), nU = Object.keys(state.upgrades).length, nA = Object.keys(state.ach).length;
   const row = (a, b) => `<div class="stat"><span>${a}</span><span>${b}</span></div>`;
   openModal(`<h2>Stats</h2>
-    ${row('Damians in bank', fmt(state.damians))}${row('Damians made (all time)', fmt(state.total))}
+    ${row('Damians in bank', fmt(state.damians))}${row('Damians made (this life)', fmt(state.total))}${row('Damians made (all lives)', fmt(allTime()))}
+    ${row('Rebirths', state.rebirths)}${row('Damian Souls', `${fmt(state.souls)} (+${fmt(Math.round((soulMult() - 1) * 100))}% production)`)}
     ${row('Damians per second', fmt(dps(), 1))}${row('Damians per click', fmt(clickPower(), 1))}
     ${row('Damian clicks', fmt(state.clicks))}${row('Damians made by clicking', fmt(state.handMade))}
     ${row('Golden Damians clicked', state.goldenClicks)}${row('Buildings owned', nB)}
@@ -1162,6 +1292,130 @@ function showOptions() {
 }
 let resetting = false;
 
+/* ---- rebirth + Soul Shop ---- */
+let rebirthArmed = false;
+function showRebirth() {
+  const pend = pendingSouls(), next = Math.pow(soulsFor(allTime()) + 1, 3) * SOUL_DIVISOR;
+  const row = (a, b) => `<div class="stat"><span>${a}</span><span>${b}</span></div>`;
+  rebirthArmed = false;
+  openModal(`<h2>👼 Rebirth</h2>
+    <p class="muted">Rebirthing throws away your Damians, buildings, upgrades and Damian form, and starts you over from zero.
+    In return you get <b style="color:#fff">Damian Souls</b>. Every soul makes all Damian production <b style="color:#fff">+${hasPerk('soulPower') ? 3 : 2}%</b> forever,
+    and you can spend them in the Soul Shop below. Achievements, souls and perks are never lost.</p>
+    ${row('Rebirths so far', state.rebirths)}${row('Damian Souls', `${fmt(state.souls)} (+${fmt(Math.round((soulMult() - 1) * 100))}% production)`)}
+    ${row('Souls you get if you rebirth now', '+' + fmt(pend))}${row('Next soul at', fmt(next) + ' Damians made (all lives)')}
+    <div class="opt"><button class="btn rb" id="rbGo" ${pend < 1 ? 'disabled' : ''}>${pend < 1 ? 'Make more Damians to earn a soul' : `Rebirth for +${fmt(pend)} soul${pend === 1 ? '' : 's'}`}</button></div>
+    <h2 style="margin-top:14px">Soul Shop <small class="muted" style="font-family:Nunito;font-size:14px">you have ${fmt(soulsFree())} souls to spend</small></h2>
+    <div class="perks">${PERKS.map(p => `<div class="perk ${hasPerk(p.id) ? 'got' : ''}"><div class="pi">${p.icon}</div>
+      <div class="pt"><b class="pn">${p.name}</b>${p.desc}</div>
+      <button class="btn" data-perk="${p.id}" ${hasPerk(p.id) || soulsFree() < p.cost ? 'disabled' : ''}>${hasPerk(p.id) ? 'Owned' : p.cost + ' 👼'}</button></div>`).join('')}</div>`);
+  $('rbGo').onclick = () => {
+    if (!rebirthArmed) { rebirthArmed = true; $('rbGo').textContent = 'Are you sure? Click again to rebirth'; return; }
+    doRebirth(false);
+  };
+  $('modalBody').querySelectorAll('[data-perk]').forEach(b => b.onclick = () => buyPerk(b.dataset.perk));
+}
+function buyPerk(id) {
+  const p = PERKS.find(q => q.id === id);
+  if (!p || hasPerk(id) || soulsFree() < p.cost) return;
+  state.soulsSpent += p.cost; state.perks[id] = 1; sfx('buy'); toast(p.name, p.desc, 2500);
+  save(); updateUI(); const sc = $('modal').querySelector('.panel').scrollTop; showRebirth(); $('modal').querySelector('.panel').scrollTop = sc;
+}
+function doRebirth(force) {
+  const pend = pendingSouls(); if (pend < 1 && !force) return;
+  state.souls += pend; state.rebirths++; state.prevTotal += state.total;
+  Object.assign(state, { damians: 0, total: 0, handMade: 0, owned: {}, upgrades: {}, buffs: [], stage: 0 });
+  if (hasPerk('head')) state.owned = { cursor: 10, grandma: 5, farm: 2 };
+  if (hasPerk('bigStart')) state.damians = 1e6;
+  closeModal(); upgKey = ''; setStage(0, false); renderWorld(); updateUI(); save();
+  $('flash').classList.remove('go'); void $('flash').offsetWidth; $('flash').classList.add('go');
+  sfx('evolve'); setTimeout(() => voice(true), 700);
+  toast('Damian has been reborn!', `Rebirth #${state.rebirths}. You now have ${fmt(state.souls)} souls (+${fmt(Math.round((soulMult() - 1) * 100))}% production forever).`, 6000);
+}
+
+/* ---- secret admin menu (only works with the password) ---- */
+const ADMIN_HASH = '77347e6cd4b59eaee0428315af8c990bdf3df5484b16f1e61b41f4e23233fdaa';
+function sha256(str) {
+  const rr = (v, n) => (v >>> n) | (v << (32 - n)), K = [], H = [];
+  for (let c = 2, n = 0; n < 64; c++) {
+    let prime = true; for (let d = 2; d * d <= c; d++) if (c % d === 0) { prime = false; break; }
+    if (!prime) continue;
+    if (n < 8) H[n] = (Math.pow(c, 1 / 2) * 4294967296) | 0;
+    K[n++] = (Math.pow(c, 1 / 3) * 4294967296) | 0;
+  }
+  const bytes = Array.from(new TextEncoder().encode(str)), bits = bytes.length * 8, w = [];
+  bytes.push(0x80); while (bytes.length % 64 !== 56) bytes.push(0);
+  for (let i = 7; i >= 0; i--) bytes.push(i >= 4 ? 0 : (bits >>> (i * 8)) & 255);
+  for (let j = 0; j < bytes.length; j += 64) {
+    for (let i = 0; i < 16; i++) w[i] = (bytes[j + 4 * i] << 24) | (bytes[j + 4 * i + 1] << 16) | (bytes[j + 4 * i + 2] << 8) | bytes[j + 4 * i + 3];
+    for (let i = 16; i < 64; i++) {
+      const s0 = rr(w[i - 15], 7) ^ rr(w[i - 15], 18) ^ (w[i - 15] >>> 3), s1 = rr(w[i - 2], 17) ^ rr(w[i - 2], 19) ^ (w[i - 2] >>> 10);
+      w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+    }
+    let [a, b, c, d, e, f, g, h] = H;
+    for (let i = 0; i < 64; i++) {
+      const t1 = (h + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0;
+      const t2 = ((rr(a, 2) ^ rr(a, 13) ^ rr(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    [a, b, c, d, e, f, g, h].forEach((v, i) => H[i] = (H[i] + v) | 0);
+  }
+  return H.map(v => (v >>> 0).toString(16).padStart(8, '0')).join('');
+}
+let logoTaps = [], adminOk = false;
+try { adminOk = sessionStorage.getItem('dcAdmin') === ADMIN_HASH; } catch (e) { }
+function logoTap() {
+  const now = Date.now(); logoTaps = logoTaps.filter(t => now - t < 3000); logoTaps.push(now);
+  if (logoTaps.length >= 7) { logoTaps = []; adminOk ? showAdmin() : askAdmin(); }
+}
+function askAdmin() {
+  openModal(`<h2>🔒</h2><form id="adForm" class="opt"><input id="adPw" type="password" autocomplete="off" style="flex:1"><button class="btn">OK</button></form>`);
+  $('adPw').focus();
+  $('adForm').onsubmit = e => {
+    e.preventDefault();
+    if (sha256($('adPw').value.trim().toLowerCase()) !== ADMIN_HASH) { closeModal(); return; }
+    adminOk = true; try { sessionStorage.setItem('dcAdmin', ADMIN_HASH); } catch (e) { }
+    showAdmin();
+  };
+}
+function showAdmin() {
+  const sel = (id, opts) => `<select id="${id}">${opts}</select>`;
+  openModal(`<h2>🛠️ Admin Menu</h2><div class="adm">
+    <label>Damians</label><div class="opt"><input id="adAmt" value="1e9"><button data-a="add">Add</button><button data-a="set">Set bank</button><button data-a="x10">Bank x10</button></div>
+    <label>Buildings</label><div class="opt">${sel('adB', BUILDINGS.map(b => `<option value="${b.id}">${b.name}</option>`).join(''))}<input id="adBn" value="10" style="width:70px"><button data-a="give">Give</button><button data-a="giveAll">+10 of everything</button></div>
+    <label>Upgrades and achievements</label><div class="opt"><button data-a="upAll">Unlock all upgrades</button><button data-a="achAll">Unlock all achievements</button></div>
+    <label>Damian form</label><div class="opt">${sel('adS', STAGES.map((s, i) => `<option value="${i}" ${i === state.stage ? 'selected' : ''}>${s.name}</option>`).join(''))}<button data-a="stage">Set form</button></div>
+    <label>Golden Damians and buffs</label><div class="opt"><button data-a="gold">Spawn Golden Damian</button><button data-a="frenzy">Frenzy x77 (60s)</button><button data-a="fury">Fury x777 (30s)</button></div>
+    <label>Production speed (until you reload)</label><div class="opt">${[1, 10, 100, 1000].map(n => `<button data-a="spd" data-n="${n}" ${adminSpeed === n ? 'style="background:#ffd34d;color:#000"' : ''}>x${n}</button>`).join('')}</div>
+    <label>Time skip</label><div class="opt"><button data-a="skip" data-n="3600">+1 hour</button><button data-a="skip" data-n="86400">+1 day</button></div>
+    <label>Rebirth</label><div class="opt"><input id="adSouls" value="100"><button data-a="souls">Give souls</button><button data-a="perksAll">Unlock all perks</button><button data-a="reborn">Force rebirth</button></div>
+    <div class="opt"><button data-a="lock" style="background:#8a1f2f">Lock admin menu</button></div></div>`);
+  $('modalBody').querySelectorAll('button[data-a]').forEach(b => { b.classList.add('btn'); b.onclick = () => adminDo(b.dataset.a, +b.dataset.n); });
+}
+function adminDo(a, n) {
+  const num = id => { const v = Number(String($(id).value).replace(/[, ]/g, '')); return isFinite(v) && v >= 0 ? v : 0; };
+  const gain = g => { state.damians += g; state.total += g; };
+  let msg = 'Done.';
+  if (a === 'add') gain(num('adAmt'));
+  else if (a === 'set') state.damians = num('adAmt');
+  else if (a === 'x10') gain(state.damians * 9);
+  else if (a === 'give') { const id = $('adB').value; state.owned[id] = own(id) + Math.floor(num('adBn')); renderWorld(); }
+  else if (a === 'giveAll') { BUILDINGS.forEach(b => state.owned[b.id] = own(b.id) + 10); renderWorld(); }
+  else if (a === 'upAll') UPGRADES.forEach(u => state.upgrades[u.id] = 1);
+  else if (a === 'achAll') ACH.forEach(([id]) => state.ach[id] = 1);
+  else if (a === 'stage') { const i = +$('adS').value; if (state.total < STAGES[i].at || i < state.stage) state.total = STAGES[i].at; state.stage = i; setStage(i, true); }
+  else if (a === 'gold') { removeGolden(); spawnGolden(); closeModal(); msg = 'Golden Damian is out. Go click it.'; }
+  else if (a === 'frenzy') state.buffs.push({ type: 'frenzy', mult: 77, end: Date.now() + 60000, name: 'Admin Frenzy' });
+  else if (a === 'fury') state.buffs.push({ type: 'click', mult: 777, end: Date.now() + 30000, name: 'Admin Fury' });
+  else if (a === 'spd') { adminSpeed = n || 1; showAdmin(); }
+  else if (a === 'skip') { const g = baseDps() * n; gain(g); msg = `Skipped ahead and made ${fmt(g)} Damians.`; }
+  else if (a === 'souls') state.souls += Math.floor(num('adSouls'));
+  else if (a === 'perksAll') PERKS.forEach(p => state.perks[p.id] = 1);
+  else if (a === 'reborn') { doRebirth(true); return; }
+  else if (a === 'lock') { adminOk = false; adminSpeed = 1; try { sessionStorage.removeItem('dcAdmin'); } catch (e) { } closeModal(); msg = 'Admin menu locked.'; }
+  toast('Admin', msg, 1500); updateUI(); save();
+}
+
 /* =====================================================================
    START
    ===================================================================== */
@@ -1178,15 +1432,17 @@ async function startGame() {
 
   const away = (Date.now() - (state.lastSave || Date.now())) / 1000;
   lastTick = Date.now();
+  const awayCap = hasPerk('night') ? 259200 : 86400;
   if (away > 60 && baseDps() > 0) {
-    const gain = baseDps() * Math.min(away, 86400); state.damians += gain; state.total += gain;
-    setTimeout(() => toast('Welcome back!', `While you were gone (${fmtTime(Math.min(away, 86400))}), your Damian empire made ${fmt(gain)} Damians.`, 6000), 400);
+    const gain = baseDps() * Math.min(away, awayCap); state.damians += gain; state.total += gain;
+    setTimeout(() => toast('Welcome back!', `While you were gone (${fmtTime(Math.min(away, awayCap))}), your Damian empire made ${fmt(gain)} Damians.`, 6000), 400);
   }
   setStage(state.stage, false); renderWorld(); updateUI(); scheduleGolden();
 
   $('bigDamian').addEventListener('pointerdown', onClick);
   $('bigDamian').addEventListener('contextmenu', e => e.preventDefault());
-  $('btnStats').onclick = showStats; $('btnOptions').onclick = showOptions;
+  $('btnStats').onclick = showStats; $('btnOptions').onclick = showOptions; $('btnRebirth').onclick = showRebirth;
+  $('logo').addEventListener('pointerdown', logoTap);
   const muteBtn = $('btnMute'); const setMute = () => muteBtn.textContent = state.mute ? '🔇' : '🔊'; setMute();
   muteBtn.onclick = () => { state.mute = !state.mute; setMute(); };
   $('modal').addEventListener('pointerdown', e => { if (e.target === $('modal')) closeModal(); });
