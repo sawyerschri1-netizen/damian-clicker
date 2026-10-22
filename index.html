@@ -745,6 +745,14 @@ GOLDUPS.forEach(([name, cost], i) => UPGRADES.push({
   id: `gold_${i}`, name, cost, color: '#ffd34d', icon: () => ICONS.golden,
   desc: 'Golden Damians show up <b>more often</b> and stay <b>longer</b>.', flavor: 'Fortune favors the Damian.', unlock: () => state.total >= cost * .5 && state.goldenClicks >= i,
 }));
+// The very last upgrade in the game.
+let SAWYER_ICON = null;
+UPGRADES.push({
+  id: 'sawyer', name: 'Sawyer', cost: 1e22, color: '#ff4df0',
+  icon: () => SAWYER_ICON || (SAWYER_ICON = render(BASES[0], { inside: ['rainbow', 'rays'], over: ['halo', 'crown', 'rainbowShades', 'sparkles'], ring: '#fff', bg: '#000' }, 128)),
+  desc: 'The final upgrade. All Damian production and clicking <b>x10</b>.', flavor: 'Made by Sawyer. Even Damian bows to him.',
+  unlock: () => own('sing') >= 1 && state.total >= 1e21,
+});
 
 const ACH = [
   ['click1', 'Hello, Damian', 'Click Damian once.', s => s.clicks >= 1],
@@ -854,7 +862,7 @@ const soulsFor = n => Math.floor(Math.cbrt(n / SOUL_DIVISOR));
 const pendingSouls = () => Math.max(0, soulsFor(allTime()) - state.souls);
 const soulsFree = () => state.souls - state.soulsSpent;
 function soulMult() { return 1 + state.souls * (hasPerk('soulPower') ? .03 : .02); }
-function prodMult() { return flavMult() * soulMult() * (hasPerk('overdrive') ? 2 : 1) * (hasPerk('hyper') ? 3 : 1) * adminSpeed; }
+function prodMult() { return flavMult() * soulMult() * (hasPerk('overdrive') ? 2 : 1) * (hasPerk('hyper') ? 3 : 1) * (state.upgrades.sawyer ? 10 : 1) * adminSpeed; }
 function costMult() { return (hasPerk('cheap') ? .9 : 1) * (hasPerk('cheap2') ? .85 : 1); }
 function buffLen() { return hasPerk('lucky') ? 1.5 : 1; }
 let adminSpeed = 1;   // admin menu production booster, never saved
