@@ -662,6 +662,12 @@ const RECIPES = {
   galaxy:  { filter: 'hue-rotate(200deg) saturate(1.5) contrast(1.15)', inside: ['starsIn', 'swirl'], over: ['orbits', 'sparkles'], ring: '#a0b4ff', bg: '#0a0a40' },
   multi:   { filter: 'hue-rotate(300deg) saturate(2.2) contrast(1.2)', inside: ['swirl', 'ghost'], over: ['halo', 'thirdEye', 'whiteEyes'], ring: '#ff9df5', bg: '#300040' },
   sing:    { filter: 'contrast(1.4) saturate(1.8)', inside: ['rainbow', 'rays'], over: ['fire', 'horns', 'crown', 'rainbowShades', 'laser', 'sparkles'], ring: '#fff', bg: '#000', anim: 'rainbow' },
+  black:   { filter: 'grayscale(1) contrast(1.6) brightness(.65)', inside: ['swirl'], over: ['whiteEyes', 'orbits'], ring: '#6a4cff', bg: '#05050f' },
+  sim:     { filter: 'hue-rotate(90deg) saturate(3) contrast(1.3)', inside: ['starsIn'], over: ['goggles', 'sparkles'], ring: '#3dff6a', bg: '#002a10' },
+  heaven:  { filter: 'brightness(1.25) saturate(.6) sepia(.3)', inside: ['rays'], over: ['halo', 'sparkles'], ring: '#fff6c0', bg: '#b8a050' },
+  omni:    { filter: 'hue-rotate(180deg) saturate(2) contrast(1.2)', inside: ['swirl', 'sparkleIn'], over: ['thirdEye', 'laser', 'orbits'], ring: '#40e0ff', bg: '#002a3a' },
+  bang:    { filter: 'saturate(2.5) contrast(1.4) brightness(1.1)', inside: ['rays', 'starsIn'], over: ['fire', 'sparkles'], ring: '#ff8a20', bg: '#3a1000' },
+  absolute: { filter: 'contrast(1.5) saturate(2)', inside: ['rainbow', 'swirl', 'starsIn'], over: ['fire', 'horns', 'halo', 'crown', 'rainbowShades', 'laser', 'orbits', 'sparkles'], ring: '#fff', bg: '#000', anim: 'rainbow' },
   golden: { filter: 'sepia(1) saturate(3.5) hue-rotate(-8deg) brightness(1.1)', over: ['sparkles'], ring: '#ffd34d', bg: '#7a5a00' },
 };
 
@@ -702,6 +708,13 @@ const BUILDINGS = [
   { id: 'galaxy',  name: 'Damian Galaxy',        plural: 'Damian Galaxies',       base: 3.1e17, dps: 1.5e11, desc: 'A whole galaxy where every star is just Damian.' },
   { id: 'multi',   name: 'Damian Multiverse',    plural: 'Damian Multiverses',    base: 4e18,   dps: 1.1e12, desc: 'Steals Damians from every other universe. They want them back.' },
   { id: 'sing',    name: 'THE DAMIAN SINGULARITY', plural: 'DAMIAN SINGULARITIES', base: 5.5e19, dps: 8e12, desc: 'All of reality collapses into one infinitely dense Damian.' },
+  // the late game: each of these costs about 40 times more than the one before it
+  { id: 'black',   name: 'Damian Black Hole',    plural: 'Damian Black Holes',    base: 2.2e21, dps: 6.5e13, desc: 'Sucks in whole universes and spits them back out as Damian.' },
+  { id: 'sim',     name: 'Damian Simulation',    plural: 'Damian Simulations',    base: 9e22,   dps: 5e14,   desc: 'Turns out we all live inside Damian\'s computer. He is running more Damians.' },
+  { id: 'heaven',  name: 'Damian Heaven',        plural: 'Damian Heavens',        base: 4e24,   dps: 4e15,   desc: 'Every good Damian goes here. They come back down as even more Damian.' },
+  { id: 'omni',    name: 'Omni-Damian Engine',   plural: 'Omni-Damian Engines',   base: 1.8e26, dps: 3.2e16, desc: 'A machine that is everywhere at once, making Damian everywhere at once.' },
+  { id: 'bang',    name: 'Damian Big Bang',      plural: 'Damian Big Bangs',      base: 8e27,   dps: 2.5e17, desc: 'Restarts the entire universe, except this time it is all Damian.' },
+  { id: 'absolute', name: 'THE DAMIAN ABSOLUTE', plural: 'DAMIAN ABSOLUTES',      base: 4e29,   dps: 2e18,   desc: 'There is nothing left anywhere that is not Damian. This is the end of everything.' },
 ];
 const BY_ID = Object.fromEntries(BUILDINGS.map(b => [b.id, b]));
 
@@ -783,6 +796,10 @@ const ACH = [
   ['gold77', 'Golden Addiction', 'Click 77 Golden Damians.', s => s.goldenClicks >= 77],
   ['own500', 'Damian Landlord', 'Own 500 buildings at once.', () => BUILDINGS.reduce((n, b) => n + own(b.id), 0) >= 500],
   ['sing1', 'Event Horizon', 'Own THE DAMIAN SINGULARITY.', () => own('sing') >= 1],
+  ['black1', 'Spaghettified', 'Own a Damian Black Hole.', () => own('black') >= 1],
+  ['heaven1', 'Damian Ascension', 'Own a Damian Heaven.', () => own('heaven') >= 1],
+  ['bang1', 'In the Beginning There Was Damian', 'Own a Damian Big Bang.', () => own('bang') >= 1],
+  ['absolute1', 'Nothing But Damian', 'Own THE DAMIAN ABSOLUTE.', () => own('absolute') >= 1],
   ['cosmic', 'Beyond Omega', 'Unlock Cosmic Damian.', s => s.stage >= 7],
   ['onetrue', 'There Can Be Only One', 'Unlock THE ONE TRUE DAMIAN.', s => s.stage >= STAGES.length - 1],
   ['reb1', 'Born Again', 'Rebirth once.', s => s.rebirths >= 1],
@@ -823,6 +840,12 @@ const NEWS = [
   [() => own('galaxy') > 0, 'NASA renames the Milky Way to the Damian Way. Nobody objects.'],
   [() => own('multi') > 0, 'Damian from another universe visits. He is also named Damian.'],
   [() => own('sing') > 0, 'Physicists confirm the universe is now 100% Damian. "We had a good run," they say.'],
+  [() => own('black') > 0, 'Scientists warn not to look directly into the Damian Black Hole. Everyone looks anyway.'],
+  [() => own('sim') > 0, 'Breaking: reality confirmed to be a simulation running on Damian\'s old laptop.'],
+  [() => own('heaven') > 0, 'Angels report that heaven is "mostly Damian now." Harps replaced with Damian voices.'],
+  [() => own('omni') > 0, 'The Omni-Damian Engine is everywhere at once. It is in your house. It is behind you.'],
+  [() => own('bang') > 0, 'The universe restarts. First words ever spoken: "Damian."'],
+  [() => own('absolute') > 0, 'There is no news anymore. There is only Damian.'],
   [s => s.rebirths > 0, 'Damian reborn again. Claims to remember all his past lives, all of which were Damian.'],
   [s => s.rebirths > 0, 'Soul Shop reports record sales. Souls are, of course, Damian souls.'],
   [s => s.rebirths >= 5, 'Scientists baffled as Damian keeps dying and coming back stronger. "Just like a video game," says Damian.'],
@@ -831,19 +854,19 @@ const NEWS = [
 
 // Soul Shop perks. Bought with Damian Souls and kept forever, through every rebirth.
 const PERKS = [
-  { id: 'fingers',   name: 'Strong Fingers',    cost: 1,   icon: '💪', desc: 'Clicking Damian is <b>3x</b> as strong.' },
-  { id: 'cheap',     name: 'Cheap Labor',       cost: 5,   icon: '🏷️', desc: 'All buildings are <b>10%</b> cheaper.' },
+  { id: 'fingers',   name: 'Strong Fingers',    cost: 1,   icon: '💪', desc: 'Clicking Damian is <b>2x</b> as strong.' },
+  { id: 'cheap',     name: 'Cheap Labor',       cost: 5,   icon: '🏷️', desc: 'All buildings are <b>6%</b> cheaper.' },
   { id: 'head',      name: 'Head Start',        cost: 10,   icon: '🚀', desc: 'Every rebirth starts with <b>10 Cursors, 5 Grandmas and 2 Farms</b>.' },
   { id: 'goldTouch', name: 'Golden Touch',      cost: 20,  icon: '✨', desc: 'Golden Damians show up <b>50%</b> more often.' },
   { id: 'night',     name: 'Night Shift',       cost: 30,  icon: '🌙', desc: 'While you are away, Damians keep coming for up to <b>3 days</b> instead of 1.' },
   { id: 'lucky',     name: 'Lucky Charm',       cost: 40,  icon: '🍀', desc: 'Golden Damian buffs last <b>50%</b> longer.' },
   { id: 'twin',      name: 'Twin Damians',      cost: 60,  icon: '👯', desc: 'Every click has a <b>10%</b> chance to be a <b>x10</b> critical click.' },
-  { id: 'bigStart',  name: 'Trust Fund',        cost: 80,  icon: '💰', desc: 'Every rebirth starts with <b>1 million</b> Damians in the bank.' },
-  { id: 'overdrive', name: 'Overdrive',         cost: 100,  icon: '⚡', desc: 'All Damian production <b>x2</b>.' },
-  { id: 'auto',      name: 'Ghost Clicker',     cost: 150,  icon: '👻', desc: 'A ghost of Damian clicks him for you <b>5 times a second</b>.' },
-  { id: 'soulPower', name: 'Soul Fusion',       cost: 200, icon: '🔥', desc: 'Each soul gives <b>+3%</b> production instead of +2%.' },
-  { id: 'cheap2',    name: 'Damian Union Deal', cost: 300, icon: '🤝', desc: 'All buildings are another <b>15%</b> cheaper.' },
-  { id: 'hyper',     name: 'Hyperdrive',        cost: 500, icon: '🌌', desc: 'All Damian production <b>x3</b>.' },
+  { id: 'bigStart',  name: 'Trust Fund',        cost: 80,  icon: '💰', desc: 'Every rebirth starts with <b>250,000</b> Damians in the bank.' },
+  { id: 'overdrive', name: 'Overdrive',         cost: 100,  icon: '⚡', desc: 'All Damian production <b>x1.5</b>.' },
+  { id: 'auto',      name: 'Ghost Clicker',     cost: 150,  icon: '👻', desc: 'A ghost of Damian clicks him for you <b>3 times a second</b>.' },
+  { id: 'soulPower', name: 'Soul Fusion',       cost: 200, icon: '🔥', desc: 'Each soul gives <b>+1.5%</b> production instead of +1%.' },
+  { id: 'cheap2',    name: 'Damian Union Deal', cost: 300, icon: '🤝', desc: 'All buildings are another <b>10%</b> cheaper.' },
+  { id: 'hyper',     name: 'Hyperdrive',        cost: 500, icon: '🌌', desc: 'All Damian production <b>x2</b>.' },
 ];
 const SOUL_DIVISOR = 1e12;   // souls earned = cube root of (all-time Damians / this)
 
@@ -861,9 +884,9 @@ const allTime = () => state.prevTotal + state.total;
 const soulsFor = n => Math.floor(Math.cbrt(n / SOUL_DIVISOR));
 const pendingSouls = () => Math.max(0, soulsFor(allTime()) - state.souls);
 const soulsFree = () => state.souls - state.soulsSpent;
-function soulMult() { return 1 + state.souls * (hasPerk('soulPower') ? .03 : .02); }
-function prodMult() { return flavMult() * soulMult() * (hasPerk('overdrive') ? 2 : 1) * (hasPerk('hyper') ? 3 : 1) * (state.upgrades.sawyer ? 10 : 1) * adminSpeed; }
-function costMult() { return (hasPerk('cheap') ? .9 : 1) * (hasPerk('cheap2') ? .85 : 1); }
+function soulMult() { return 1 + state.souls * (hasPerk('soulPower') ? .015 : .01); }   // souls are worth less than they used to be
+function prodMult() { return flavMult() * soulMult() * (hasPerk('overdrive') ? 1.5 : 1) * (hasPerk('hyper') ? 2 : 1) * (state.upgrades.sawyer ? 10 : 1) * adminSpeed; }
+function costMult() { return (hasPerk('cheap') ? .94 : 1) * (hasPerk('cheap2') ? .9 : 1); }
 function buffLen() { return hasPerk('lucky') ? 1.5 : 1; }
 let adminSpeed = 1;   // admin menu production booster, never saved
 let BASES = [], ICONS = {}, FLAV_ICONS = {}, STAGE_BIG = null, STAGE_SMALL = null, shownStage = -1, bulk = 1, usingPlaceholder = false;
@@ -878,7 +901,7 @@ function baseDps() { let s = 0; BUILDINGS.forEach(b => s += own(b.id) * b.dps * 
 function dps() { return baseDps() * buffMult('frenzy'); }
 function clickPower() {
   let pct = 0; CLICKUPS.forEach((c, i) => { if (state.upgrades['click_' + i]) pct += .01; });
-  return (SPEED.click * bMult(BUILDINGS[0]) * prodMult() * buffMult('frenzy') + pct * dps()) * buffMult('click') * (hasPerk('fingers') ? 3 : 1);
+  return (SPEED.click * bMult(BUILDINGS[0]) * prodMult() * buffMult('frenzy') + pct * dps()) * buffMult('click') * (hasPerk('fingers') ? 2 : 1);
 }
 function price(b) { return Math.ceil(b.base * Math.pow(GROW, own(b.id)) * costMult()); }
 function bulkCost(b, n) { return Math.ceil(b.base * Math.pow(GROW, own(b.id)) * (Math.pow(GROW, n) - 1) / (GROW - 1) * costMult()); }
@@ -1095,7 +1118,7 @@ function tick() {
   const now = Date.now(); let dt = (now - lastTick) / 1000; lastTick = now;
   dt = Math.max(0, Math.min(dt, 86400));
   const g = dps() * dt; state.damians += g; state.total += g;
-  if (hasPerk('auto') && dt < 5) { const a = clickPower() * 5 * dt; state.damians += a; state.total += a; }
+  if (hasPerk('auto') && dt < 5) { const a = clickPower() * 3 * dt; state.damians += a; state.total += a; }
   state.buffs = state.buffs.filter(b => b.end > now);
   if (!golden && now >= nextGoldenAt) spawnGolden();
   if (golden && now > golden.until) removeGolden();
@@ -1308,7 +1331,7 @@ function showRebirth() {
   rebirthArmed = false;
   openModal(`<h2>👼 Rebirth</h2>
     <p class="muted">Rebirthing throws away your Damians, buildings, upgrades and Damian form, and starts you over from zero.
-    In return you get <b style="color:#fff">Damian Souls</b>. Every soul makes all Damian production <b style="color:#fff">+${hasPerk('soulPower') ? 3 : 2}%</b> forever,
+    In return you get <b style="color:#fff">Damian Souls</b>. Every soul makes all Damian production <b style="color:#fff">+${hasPerk('soulPower') ? 1.5 : 1}%</b> forever,
     and you can spend them in the Soul Shop below. Achievements, souls and perks are never lost.</p>
     ${row('Rebirths so far', state.rebirths)}${row('Damian Souls', `${fmt(state.souls)} (+${fmt(Math.round((soulMult() - 1) * 100))}% production)`)}
     ${row('Souls you get if you rebirth now', '+' + fmt(pend))}${row('Next soul at', fmt(next) + ' Damians made (all lives)')}
@@ -1334,7 +1357,7 @@ function doRebirth(force) {
   state.souls += pend; state.rebirths++; state.prevTotal += state.total;
   Object.assign(state, { damians: 0, total: 0, handMade: 0, owned: {}, upgrades: {}, buffs: [], stage: 0 });
   if (hasPerk('head')) state.owned = { cursor: 10, grandma: 5, farm: 2 };
-  if (hasPerk('bigStart')) state.damians = 1e6;
+  if (hasPerk('bigStart')) state.damians = 2.5e5;
   closeModal(); upgKey = ''; setStage(0, false); renderWorld(); updateUI(); save();
   $('flash').classList.remove('go'); void $('flash').offsetWidth; $('flash').classList.add('go');
   sfx('evolve'); setTimeout(() => voice(true), 700);
