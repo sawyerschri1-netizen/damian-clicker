@@ -260,7 +260,7 @@ const CONFIG = {
   voiceChance: 0.125,
   // Game speed. Raise production/click to make Damians come faster; lower
   // costGrowth (1.15 = classic Cookie Clicker) to make buildings get pricier slower.
-  speed: { production: 3, click: 2, costGrowth: 1.12, goldenEvery: [30, 90] },
+  speed: { production: 1, click: 1, costGrowth: 1.15, goldenEvery: [60, 180] },
 };
 
 const SAVE_KEY = 'damianClicker.save.v1';
@@ -832,20 +832,20 @@ const NEWS = [
 // Soul Shop perks. Bought with Damian Souls and kept forever, through every rebirth.
 const PERKS = [
   { id: 'fingers',   name: 'Strong Fingers',    cost: 1,   icon: '💪', desc: 'Clicking Damian is <b>3x</b> as strong.' },
-  { id: 'cheap',     name: 'Cheap Labor',       cost: 3,   icon: '🏷️', desc: 'All buildings are <b>10%</b> cheaper.' },
-  { id: 'head',      name: 'Head Start',        cost: 5,   icon: '🚀', desc: 'Every rebirth starts with <b>10 Cursors, 5 Grandmas and 2 Farms</b>.' },
-  { id: 'goldTouch', name: 'Golden Touch',      cost: 10,  icon: '✨', desc: 'Golden Damians show up <b>50%</b> more often.' },
-  { id: 'night',     name: 'Night Shift',       cost: 15,  icon: '🌙', desc: 'While you are away, Damians keep coming for up to <b>3 days</b> instead of 1.' },
-  { id: 'lucky',     name: 'Lucky Charm',       cost: 20,  icon: '🍀', desc: 'Golden Damian buffs last <b>50%</b> longer.' },
-  { id: 'twin',      name: 'Twin Damians',      cost: 30,  icon: '👯', desc: 'Every click has a <b>10%</b> chance to be a <b>x10</b> critical click.' },
-  { id: 'bigStart',  name: 'Trust Fund',        cost: 40,  icon: '💰', desc: 'Every rebirth starts with <b>1 million</b> Damians in the bank.' },
-  { id: 'overdrive', name: 'Overdrive',         cost: 50,  icon: '⚡', desc: 'All Damian production <b>x2</b>.' },
-  { id: 'auto',      name: 'Ghost Clicker',     cost: 75,  icon: '👻', desc: 'A ghost of Damian clicks him for you <b>5 times a second</b>.' },
-  { id: 'soulPower', name: 'Soul Fusion',       cost: 100, icon: '🔥', desc: 'Each soul gives <b>+3%</b> production instead of +2%.' },
-  { id: 'cheap2',    name: 'Damian Union Deal', cost: 150, icon: '🤝', desc: 'All buildings are another <b>15%</b> cheaper.' },
-  { id: 'hyper',     name: 'Hyperdrive',        cost: 250, icon: '🌌', desc: 'All Damian production <b>x3</b>.' },
+  { id: 'cheap',     name: 'Cheap Labor',       cost: 5,   icon: '🏷️', desc: 'All buildings are <b>10%</b> cheaper.' },
+  { id: 'head',      name: 'Head Start',        cost: 10,   icon: '🚀', desc: 'Every rebirth starts with <b>10 Cursors, 5 Grandmas and 2 Farms</b>.' },
+  { id: 'goldTouch', name: 'Golden Touch',      cost: 20,  icon: '✨', desc: 'Golden Damians show up <b>50%</b> more often.' },
+  { id: 'night',     name: 'Night Shift',       cost: 30,  icon: '🌙', desc: 'While you are away, Damians keep coming for up to <b>3 days</b> instead of 1.' },
+  { id: 'lucky',     name: 'Lucky Charm',       cost: 40,  icon: '🍀', desc: 'Golden Damian buffs last <b>50%</b> longer.' },
+  { id: 'twin',      name: 'Twin Damians',      cost: 60,  icon: '👯', desc: 'Every click has a <b>10%</b> chance to be a <b>x10</b> critical click.' },
+  { id: 'bigStart',  name: 'Trust Fund',        cost: 80,  icon: '💰', desc: 'Every rebirth starts with <b>1 million</b> Damians in the bank.' },
+  { id: 'overdrive', name: 'Overdrive',         cost: 100,  icon: '⚡', desc: 'All Damian production <b>x2</b>.' },
+  { id: 'auto',      name: 'Ghost Clicker',     cost: 150,  icon: '👻', desc: 'A ghost of Damian clicks him for you <b>5 times a second</b>.' },
+  { id: 'soulPower', name: 'Soul Fusion',       cost: 200, icon: '🔥', desc: 'Each soul gives <b>+3%</b> production instead of +2%.' },
+  { id: 'cheap2',    name: 'Damian Union Deal', cost: 300, icon: '🤝', desc: 'All buildings are another <b>15%</b> cheaper.' },
+  { id: 'hyper',     name: 'Hyperdrive',        cost: 500, icon: '🌌', desc: 'All Damian production <b>x3</b>.' },
 ];
-const SOUL_DIVISOR = 1e9;   // souls earned = cube root of (all-time Damians / this)
+const SOUL_DIVISOR = 1e12;   // souls earned = cube root of (all-time Damians / this)
 
 /* =====================================================================
    STATE
@@ -1342,7 +1342,7 @@ function doRebirth(force) {
 }
 
 /* ---- secret admin menu (only works with the password) ---- */
-const ADMIN_HASH = '77347e6cd4b59eaee0428315af8c990bdf3df5484b16f1e61b41f4e23233fdaa';
+const ADMIN_HASH = 'dda8bfd4e1ee074ed5697c643dd2e61d7110cd6615a20e5511f4231896e1a2b0';
 function sha256(str) {
   const rr = (v, n) => (v >>> n) | (v << (32 - n)), K = [], H = [];
   for (let c = 2, n = 0; n < 64; c++) {
